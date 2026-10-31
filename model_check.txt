@@ -1,26 +1,39 @@
-LAB PROGRAM 12 - ER DIAGRAM CHECKLIST
+DELIMITER //
 
-Student Entity: YES
-Course Entity: YES
-Faculty Entity: YES
-Department Entity: YES
+CREATE PROCEDURE DisplayStudents()
+BEGIN
+    DECLARE done INT DEFAULT 0;
+    DECLARE v_StudentID INT;
+    DECLARE v_StudentName VARCHAR(100);
+    DECLARE v_DepartmentID INT;
 
-Student Primary Key: StudentID
-Course Primary Key: CourseID
-Faculty Primary Key: FacultyID
-Department Primary Key: DepartmentID
+    DECLARE student_cursor CURSOR FOR
+        SELECT StudentID, StudentName, DepartmentID
+        FROM Student;
 
-Department-Student Relationship: YES
-Department-Student Cardinality: 1:N
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
 
-Faculty-Course Relationship: YES
-Faculty-Course Cardinality: 1:N
+    OPEN student_cursor;
 
-Student-Course Relationship: YES
-Student-Course Cardinality: M:N
+    student_loop: LOOP
 
-Associative Entity for Student-Course: Enrollment
+        FETCH student_cursor
+        INTO v_StudentID, v_StudentName, v_DepartmentID;
 
-One-to-One Relationship: NOT REQUIRED
+        IF done = 1 THEN
+            LEAVE student_loop;
+        END IF;
 
-Visual Diagram Created in MySQL Workbench: YES
+        SELECT
+            v_StudentID AS StudentID,
+            v_StudentName AS StudentName,
+            v_DepartmentID AS DepartmentID;
+
+    END LOOP;
+
+    CLOSE student_cursor;
+END //
+
+DELIMITER ;
+
+CALL DisplayStudents();
